@@ -122,11 +122,13 @@ if(WIN32 AND (NOT MSVC))  # On Windows, link Shlwapi.lib for non-MSVC compilers
   target_link_libraries(dmlc PRIVATE Shlwapi)
 endif()
 
-# Check location of clock_gettime; if it's in librt, link it
-include(CheckLibraryExists)
-CHECK_LIBRARY_EXISTS(rt clock_gettime "time.h" HAVE_CLOCK_GETTIME_IN_LIBRT)
-if(HAVE_CLOCK_GETTIME_IN_LIBRT)
-  target_link_libraries(dmlc PRIVATE rt)
+if(NOT APPLE) # Apple(macOS, iOS) does not have librt.
+  # Check location of clock_gettime; if it's in librt, link it
+  include(CheckLibraryExists)
+  CHECK_LIBRARY_EXISTS(rt clock_gettime "time.h" HAVE_CLOCK_GETTIME_IN_LIBRT)
+  if(HAVE_CLOCK_GETTIME_IN_LIBRT)
+    target_link_libraries(dmlc PRIVATE rt)
+  endif()
 endif()
 
 # Check headers and symbols
